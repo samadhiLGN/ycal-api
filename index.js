@@ -26,11 +26,17 @@ pool.query(`
     calories NUMERIC NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
   );
+  CREATE TABLE IF NOT EXISTS workout_plans (
+    user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    data JSONB NOT NULL DEFAULT '{"days":[]}',
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
 `).catch(err => console.error('DB init error:', err.message))
 
 app.use('/api/auth', require('./routes/auth'))
 app.use('/api/entries', require('./routes/entries'))
 app.use('/api/goal', require('./routes/goal'))
+app.use('/api/workout', require('./routes/workout'))
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => console.log(`ycal-api running on :${PORT}`))
