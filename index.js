@@ -31,12 +31,19 @@ pool.query(`
     data JSONB NOT NULL DEFAULT '{"days":[]}',
     updated_at TIMESTAMP DEFAULT NOW()
   );
-`).catch(err => console.error('DB init error:', err.message))
+`).then(() => pool.query(`
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS height_cm NUMERIC;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS weight_kg NUMERIC;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS age INTEGER;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS gender VARCHAR(10);
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS activity_level VARCHAR(20);
+`)).catch(err => console.error('DB init error:', err.message))
 
 app.use('/api/auth', require('./routes/auth'))
 app.use('/api/entries', require('./routes/entries'))
 app.use('/api/goal', require('./routes/goal'))
 app.use('/api/workout', require('./routes/workout'))
+app.use('/api/profile', require('./routes/profile'))
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => console.log(`ycal-api running on :${PORT}`))
